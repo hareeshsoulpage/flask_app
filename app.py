@@ -55,12 +55,7 @@ def index():
 
 @app.route('/start_detection', methods=['POST'])
 def start_detection():
-    # return redirect(url_for('video_feed'))
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-# @app.route('/video_feed')
-# def video_feed():
-#     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
     app.run(debug=True)
