@@ -2,5 +2,4 @@ flask>=2.2.3
 Flask-Cors>=3.0.10
 opencv-python-headless
 deepface
-tf_keras
-# tensorflow-cpu
+pip install tensorflow[and-cuda]
