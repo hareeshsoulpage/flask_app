@@ -2,4 +2,5 @@ flask>=2.2.3
 Flask-Cors>=3.0.10
 opencv-python
 deepface
-tf_keras
+# tf_keras
+tensorflow-cpu
