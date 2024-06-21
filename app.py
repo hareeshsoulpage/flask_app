@@ -59,7 +59,7 @@ def index():
 def start_detection():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/process_frame', methods=['POST'])
+@app.route('/process_frame/', methods=['POST'])
 def process_frame():
     print("inside_proces")
     data = request.get_json()
