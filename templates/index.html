@@ -4,11 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Real-time Emotion Detection</title>
+    <style>
+        #video, #canvas {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <h1>Real-time Emotion Detection</h1>
-    <form action="{{ url_for('start_detection') }}" method="post">
-        <button type="submit">Run Emotion Detection</button>
-    </form>
+    <button id="startButton">Start Emotion Detection</button>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <div id="result"></div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const startButton = document.getElementById('startButton');
+        const resultDiv = document.getElementById('result');
+
+        let streamStarted = false;
+
+        startButton.addEventListener('click', () => {
+            if (streamStarted) {
+                return;  // Prevent multiple intervals from being set
+            }
+            streamStarted = true;
+
+            // Access the camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    canvas.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error accessing the camera', error);
+                });
+
+            const context = canvas.getContext('2d');
+
+            setInterval(() => {
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const dataURL = canvas.toDataURL('image/jpeg');
+
+                fetch('/process_frame', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: dataURL })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resultDiv.innerHTML = 'Emotion: ' + data.emotion;
+                    const img = new Image();
+                    img.src = 'data:image/jpeg;base64,' + data.image;
+                    img.onload = () => {
+                        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    };
+                })
+                .catch(error => {
+                    console.error('Error processing frame', error);
+                });
+            }, 1000); // Send a frame every second
+        });
+    </script>
 </body>
 </html>
